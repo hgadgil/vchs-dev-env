@@ -3,8 +3,6 @@
 #    --verbose /tmp/vagrant-puppet/manifests/default.pp \
 #    --detailed-exitcodes 
 
-
-
 $as_vagrant   = 'sudo -u vagrant -H bash -l -c'
 $home         = '/home/vagrant'
 $vchs_base    = "${home}/vchs"
@@ -19,11 +17,12 @@ Exec {
   ]
 }
 
-package { 'curl':                ensure => 'latest' }
-package { 'build-essential':     ensure => 'latest' }
-package { 'git-core':            ensure => 'latest' }
-package { 'libcurl4-gnutls-dev': ensure => 'latest' }
-package { 'libmysqlclient-dev':  ensure => 'latest' }
+package { 'curl':                ensure => 'installed' }
+package { 'build-essential':     ensure => 'installed' }
+package { 'git-core':            ensure => 'installed' }
+package { 'libcurl4-gnutls-dev': ensure => 'installed' }
+package { 'libmysqlclient-dev':  ensure => 'installed' }
+package { 'libaio1':             ensure => 'installed' }
 
 exec { 'apt-get-update': command => "apt-get update -y" }
 
@@ -181,7 +180,7 @@ exec { 'setup dependencies as root':
 
 exec { 'setup external dependencies':
     cwd => "${vcap}/scripts",
-    command   => "/bin/bash setup_mysql.sh",
+    command   => "${as_vagrant} 'setup_mysql.sh'",
     user => "vagrant",
     logoutput => true,
     require => Notify["cloned_base_repos"]
@@ -198,7 +197,7 @@ notify { "setup dependencies":
 
 exec { 'start components':
     cwd => "${vcap}/scripts",
-    command   => "/bin/bash start_all.sh",
+    command   => "${as_vagrant} 'components.sh start'",
     user => "vagrant",
     logoutput => true,
     require => Notify["setup dependencies"]

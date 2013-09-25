@@ -45,6 +45,8 @@ quote-names
 max_allowed_packet	= 16M
 
 [mysql]
+user=root
+password=7197385c43e4a830cad8
 
 [isamchk]
 key_buffer		= 16M

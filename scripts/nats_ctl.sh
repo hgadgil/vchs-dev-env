@@ -12,8 +12,8 @@ case $1 in
   start)
     pid_guard $PIDFILE "NATS"
 
-    mkdir -p $RUN_DIR
-    mkdir -p $LOG_DIR
+    make_dir $RUN_DIR
+    make_dir $LOG_DIR
 
     echo $$ > $PIDFILE
 

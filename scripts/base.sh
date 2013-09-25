@@ -1,8 +1,5 @@
 #!/bin/sh
 
-set -e
-set -x
-
 export VCAP_HOME=/home/vagrant/vcap
 
 export RUN_DIR_BASE=$VCAP_HOME/run
@@ -17,10 +14,14 @@ export DOWNLOAD_DIR=$VCAP_HOME/download
 
 export INSTALL_DIR=$HOME/vchs
 
-mkdir -p $TMP_DIR_BASE
-mkdir -p $PKG_DIR_BASE
-mkdir -p $STORE_DIR_BASE
-
+make_dir() {
+  dir_name=$1
+  
+  echo "Making: $dir_name"
+  
+  mkdir -p $dir_name
+  chown -R vagrant:vagrant $dir_name
+}
 
 pid_guard() {
   pidfile=$1
@@ -99,3 +100,8 @@ kill_and_wait() {
 
   wait_pidfile $pidfile 1 $timeout $force
 }
+
+make_dir $TMP_DIR_BASE 
+make_dir $PKG_DIR_BASE
+make_dir $STORE_DIR_BASE
+

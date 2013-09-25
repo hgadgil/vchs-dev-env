@@ -6,12 +6,10 @@ MYSQL55_PKG_DIR=$PKG_DIR_BASE/mysql55
 MYSQLCLIENT_PKG_DIR=$PKG_DIR_BASE/mysqlclient
 
 MYSQL_TMP_DIR=$TMP_DIR_BASE/mysql55
-MYSQL_STORE_DIR=$STORE_DIR_BASE/mysql55
 
-mkdir -p $MYSQL55_PKG_DIR
-mkdir -p $MYSQLCLIENT_PKG_DIR
-mkdir -p $MYSQL_TMP_DIR
-mkdir -p $MYSQL_STORE_DIR
+make_dir $MYSQL55_PKG_DIR
+make_dir $MYSQLCLIENT_PKG_DIR
+make_dir $MYSQL_TMP_DIR
 
 # download mysql server & client
 if [ ! -f $DOWNLOAD_DIR/server-5.5.29-rel29.4-401.Linux.x86_64.tar.gz ]; then
@@ -53,8 +51,8 @@ for x in bin include lib; do
   cp -a $x $MYSQLCLIENT_PKG_DIR
 done
 
-mkdir -p $STORE_DIR_BASE/mysql_node
-mkdir -p $RUN_DIR_BASE/mysqld
+make_dir $STORE_DIR_BASE/mysql_node
+make_dir $RUN_DIR_BASE/mysqld
 
 # Setup SQL Lite
 if [ ! -f $DOWNLOAD_DIR/sqlite-autoconf-3070500.tar.gz ]; then

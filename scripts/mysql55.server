@@ -5,9 +5,6 @@
 # GIANT HACK for BOSH: this is just a trimmed down version of the ugly hack included
 # in the mysql distribution - tailored just enough to be usable with BOSH.
 
-set -x
-set -e
-
 VCAP_DIR=/home/vagrant/vcap
 
 LD_LIBRARY_PATH=$VCAP_DIR/packages/mysql55/lib/mysql
@@ -71,7 +68,7 @@ other_args="$*"
 if [ "$mode" = "start" ] && ! test -d ${datadir}; then
   echo "HACK: creating initial database"
   mkdir -p $VCAP_DIR/run/mysqld
-  chown vcap $VCAP_DIR/run/mysqld
+  chown vagrant $VCAP_DIR/run/mysqld
 
   cd $basedir
   $VCAP_DIR/packages/mysql55/bin/mysql_install_db \
@@ -147,7 +144,7 @@ case "$mode" in
     # log-error = $VCAP_DIR/log/mysql/mysqld.err
     if [ ! -d $VCAP_DIR/log/mysql ]; then
       mkdir -p $VCAP_DIR/log/mysql
-      chown vcap $VCAP_DIR/log/mysql
+      chown vagrant $VCAP_DIR/log/mysql
     fi
 
     cd $basedir
@@ -156,7 +153,6 @@ case "$mode" in
       --defaults-file=$defaults \
       --datadir=$datadir \
       --pid-file=$server_pid_file \
-      --ledir=$bindir \
       $other_args >/dev/null 2>&1 &
     wait_for_pid created $!; return_value=$?
 
