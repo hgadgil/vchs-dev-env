@@ -1,0 +1,55 @@
+---
+
+capacity: 500
+plan: '100'
+base_dir: /home/vagrant/vcap/store/mysql_node
+local_db: sqlite3:/home/vagrant/vcap/store/mysql_node/mysql_node.db
+mbus: nats://nats:nats@127.0.0.1:4222
+index: 0
+logging:
+  level: debug
+  file: /home/vagrant/vcap/log/mysql_node/mysql_node.log
+  
+  syslog: vcap.mysql_node
+  
+pid: /home/vagrant/vcap/run/mysql_node.pid
+node_id: mysql_node_100_0
+supported_versions: ['5.5']
+default_version: '5.5'
+
+max_db_size: 10
+max_long_query: 3
+max_long_tx: 30
+kill_long_tx: true
+max_user_conns: 10
+mysql:
+
+  '5.5':
+    host: localhost
+    port: 3307
+    socket: /home/vagrant/vcap/run/mysqld/mysqld55.sock
+    user: root
+    pass: "7197385c43e4a830cad8"
+    mysqldump_bin:  /home/vagrant/vcap/packages/mysql55/bin/mysqldump
+    mysql_bin:  /home/vagrant/vcap/packages/mysql55/bin/mysql
+
+connection_pool_size:
+  min: 5
+  max: 10
+connection_wait_timeout: 10
+migration_nfs: /home/vagrant/vcap/services_migration
+gzip_bin: /bin/gzip
+
+z_interval: 30
+max_nats_payload: 1048576
+fqdn_hosts: false
+op_time_limit: 6
+
+m_interval: 10
+
+warden_socket_path: /tmp/warden_mysql.sock
+
+database_lock_file: /home/vagrant/vcap/store/mysql_node/LOCK
+disabled_file: /home/vagrant/vcap/store/mysql_node/DISABLED
+
+

@@ -1,0 +1,6 @@
+export LD_LIBRARY_PATH=/home/vagrant/vcap/packages/mysql55/lib/mysql
+export PATH=/home/vagrant/vcap/packages/mysql55/bin
+
+password="7197385c43e4a830cad8"
+
+/home/vagrant/vcap/packages/mysql55/bin/mysqladmin -u root password "${password}" -S /home/vagrant/vcap/run/mysqld/mysqld55.sock

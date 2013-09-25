@@ -1,0 +1,73 @@
+---
+
+index: 0
+mbus: nats://nats:nats@127.0.0.1:4222
+
+cloud_controller_uri: http://api.tempest-dev01.127.0.0.1.xip.io
+
+service:
+  name: mysql
+  unique_id: "92a06847-9446-407f-8aaa-a6f20c1d2cdc"
+  version: "5.5"
+  description: 'MySQL database'
+  provider: core
+  provider_name: 'Core'
+  plans:
+    '100':
+      unique_id: 'ca9fd085-d3f8-4d87-af60-e4379b745634'
+      description: 'Shared service instance, 1MB memory, 10MB storage, 10 connections'
+      free: true
+      extra: ''
+  
+  default_plan: 'free'
+  cf_plan_id:
+
+    '100': 
+
+  tags: ['relational']
+  timeout: 10
+
+  supported_versions: ['5.5']
+
+  version_aliases:
+  
+    'current': '5.5'
+  
+cc_api_version: v1
+
+
+gateway_name: "Mysql (Core) Gateway"
+uaa_client_id: cf
+uaa_endpoint: http://uaa.tempest-dev01.127.0.0.1.xip.io
+uaa_client_auth_credentials:
+  username: system_services
+  password: "74ef8d16cb268d96b62d"
+service_auth_tokens:
+  mysql_core: "mysql-token"
+
+
+token: "mysql-token"
+logging:
+  file: /home/vagrant/vcap/log/mysql_gateway/mysql_gateway.log
+  level: debug
+  
+  syslog: vcap.mysql_gateway
+
+node_timeout: 8
+
+
+pid: /home/vagrant/vcap/run/mysql_gateway.pid
+z_interval: 30
+check_orphan_interval: 7200
+double_check_orphan_interval: 300
+max_nats_payload: 1048576
+
+
+plan_management:
+  plans:
+
+    '100':
+      high_water: 900
+      low_water: 100
+      allow_over_provisioning: false
+

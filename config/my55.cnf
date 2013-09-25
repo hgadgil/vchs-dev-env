@@ -1,0 +1,50 @@
+[client]
+port      = 3307
+socket	  = /home/vagrant/vcap/run/mysqld/mysqld55.sock
+
+[mysqld_safe]
+socket	  = /home/vagrant/vcap/run/mysqld/mysqld55.sock
+nice      = 0
+log-error = /home/vagrant/vcap/log/mysql/mysqld55.err.log
+
+[mysqld]
+collation_server        = utf8_unicode_ci
+character_set_server    = utf8
+user		        = vagrant
+socket		        = /home/vagrant/vcap/run/mysqld/mysqld55.sock
+port     	        = 3307
+basedir		        = /home/vagrant/vcap/packages/mysql55
+datadir                 = /home/vagrant/vcap/store/mysql55
+tmpdir                  = /home/vagrant/vcap/tmp/mysql55
+lc-messages-dir         = /home/vagrant/vcap/packages/mysql55/share
+skip-external-locking
+
+
+init-file = /home/vagrant/vcap/config/mysql_init
+
+
+key_buffer              = 128M
+innodb_buffer_pool_size = 128M
+max_allowed_packet      = 16M
+thread_stack            = 256K
+thread_cache_size       = 8
+max_connections         = 100
+table_open_cache        = 200
+myisam-recover          = BACKUP,FORCE
+query_cache_limit       = 1M
+query_cache_size        = 8M
+expire_logs_days        = 10
+innodb_file_per_table   = 1
+
+innodb_open_files       = 50000
+
+
+[mysqldump]
+quick
+quote-names
+max_allowed_packet	= 16M
+
+[mysql]
+
+[isamchk]
+key_buffer		= 16M
