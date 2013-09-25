@@ -1,7 +1,5 @@
 #!/bin/sh
 
-source ./base.sh
-
 MY_LD_FILE=/etc/ld.so.conf.d/mysql.conf
 
 [ -e "$MY_LD_FILE" ] && rm $MY_LD_FILE

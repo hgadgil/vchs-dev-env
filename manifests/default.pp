@@ -17,21 +17,23 @@ Exec {
   ]
 }
 
-package { 'curl':                ensure => 'installed' }
-package { 'build-essential':     ensure => 'installed' }
-package { 'git-core':            ensure => 'installed' }
-package { 'libcurl4-gnutls-dev': ensure => 'installed' }
-package { 'libmysqlclient-dev':  ensure => 'installed' }
-package { 'libaio1':             ensure => 'installed' }
+exec { 'install base packages': 
+  cwd => "${vcap}/scripts",
+  command   => "/bin/bash install_base_packages.sh",    
+  logoutput => true, }
 
-exec { 'apt-get-update': command => "apt-get update -y" }
+notify { "install base ubuntu libs":
+  require => [
+    Exec["install base packages"],
+  ]
+}
 
 # --- Install rvm and ruby via rvm, bundler
 
 exec { 'install_rvm':
   command => "${as_vagrant} 'curl -L https://get.rvm.io | bash -s stable'",
   creates => "${home}/.rvm",
-  require => Package['curl']
+  require => Notify['install base ubuntu libs']
 }
 
 exec { 'install_ruby':
@@ -40,7 +42,11 @@ exec { 'install_ruby':
   require => Exec['install_rvm']
 }
 
-package { 'bundler': ensure => 'installed', provider => 'gem' }
+package { 'bundler': 
+  ensure => 'installed', 
+  provider => 'gem',
+  require => Exec["install_ruby"]
+}
 
 # --- Create Base folders & copy necessary configs/scripts
 
