@@ -1,0 +1,36 @@
+---
+
+cloud_controller_uri: http://api.tempest-dev01.127.0.0.1.xip.io
+service:
+  name: echo
+  version: "1.0"
+  description: 'Echo service'
+  plans: ['free']
+  default_plan: free
+  tags: ['echo', 'echo-1.0', 'echobased', 'demo']
+  supported_versions: ['1.0']
+  version_aliases:
+    'current': '1.0'
+  timeout: 10
+ip_route: localhost
+index: 0
+mbus: nats://nats:nats@127.0.0.1:4222
+
+uaa_client_id: vmc
+uaa_endpoint: http://localhost:8080/uaa
+uaa_client_auth_credentials:
+  username: marissa
+  password: "koala"
+service_auth_tokens:
+  echo_core: "echo-token"
+
+logging:
+  file: /home/vagrant/vcap/log/echo_gateway/echo_gateway.log
+  level: debug
+
+pid: /home/vagrant/vcap/run/echo_gateway.pid
+node_timeout: 2
+cc_api_version: v1
+token: "echo_token"
+
+node_timeout: 8

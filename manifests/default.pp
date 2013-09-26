@@ -149,6 +149,22 @@ exec { 'update nats':
     require => Exec['install nats']
 }
 
+exec { 'install cf-services-contrib-release':
+    creates   => "${vchs_base}/cf-services-contrib-release",
+    command   => "git clone https://github.com/cloudfoundry/cf-services-contrib-release.git ${vchs_base}/cf-services-contrib-release",
+    user => "vagrant",
+    logoutput => true,
+    require => Notify["base_setup"]
+}
+
+exec { 'update cf-services-contrib-release':
+    cwd => "${vchs_base}/cf-services-contrib-release/src/services/echo",
+    command   => "git pull origin master && bundle",
+    user => "vagrant",
+    logoutput => true,
+    require => Exec['install cf-services-contrib-release']
+}
+
 #exec { 'install service_controller':
 #    creates   => "${vchs_base}/service_controller",
 #    command   => "git clone https://github.com/vchs/service_controller.git ${vchs_base}/service_controller",
@@ -171,6 +187,7 @@ notify { "cloned_base_repos":
     Exec['update cf-services-release'],
     Exec['update nats'],
     Exec['update mysql_service'],
+    Exec['update cf-services-contrib-release'],
 #    Exec['update service_controller'],
   ]
 }
