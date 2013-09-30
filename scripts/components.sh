@@ -7,9 +7,9 @@ case $1 in
   start)
    ./nats_ctl.sh start &
    
-   ./mysql_ctl.sh start &
-   ./mysql_gateway_ctl.sh start &
-   ./mysql_node_ctl.sh start &
+#   ./mysql_ctl.sh start &
+#   ./mysql_gateway_ctl.sh start &
+#   ./mysql_node_ctl.sh start &
    
    ./echo_gateway_ctl.sh start &
    ./echo_node_ctl.sh start &
@@ -18,9 +18,9 @@ case $1 in
     ;;
 
   stop)
-   ./mysql_node_ctl.sh stop
-   ./mysql_gateway_ctl.sh stop
-   ./mysql_ctl.sh stop
+#   ./mysql_node_ctl.sh stop
+#   ./mysql_gateway_ctl.sh stop
+#   ./mysql_ctl.sh stop
    
    ./echo_gateway_ctl.sh stop
    ./echo_node_ctl.sh stop

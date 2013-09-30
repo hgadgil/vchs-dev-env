@@ -10,6 +10,9 @@ Prerequisites:
 Starting Vagrant VM:
 -------------------
 
+1. Add the vagrant box (This will shortly be moved to custom box created using veewee)
+    ``vagrant box add http://files.vagrantup.com/precise64.box``
+
 1. Clone this repo
     ``git clone https://...``ß
 
@@ -29,6 +32,7 @@ Installation Folder Structure:
     /home/vagrant
     |
     \
+     - setup (setup scripts)
      - vcap (scripts, config files and runtime - logs, pidfiles, db etc...)
        |
        \
@@ -44,6 +48,11 @@ Installation Folder Structure:
         - vcap-services-base
         - ...
 
+
+1. There is a handy script $HOME/vcap/scripts/components.sh to start/stop all components
+
+2. Individual components (X) can be started/stopped via X_ctl.sh
+
 Known Issues:
 ------------
 
@@ -52,5 +61,3 @@ Known Issues:
 
 2. NATS process takes up 40% - 60% CPU. So you'll notice some slowness when running shell
    commands.
-   - There is a handy script $HOME/vcap/scripts/components.sh to start/stop all components
-   - Individual components (X) can be started/stopped via X_ctl.sh

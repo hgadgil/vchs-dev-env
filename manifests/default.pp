@@ -1,8 +1,3 @@
-# Run from vagrant vm as:
-# /opt/vagrant_ruby/bin/ruby /opt/vagrant_ruby/bin/puppet apply \
-#    --verbose /tmp/vagrant-puppet/manifests/default.pp \
-#    --detailed-exitcodes 
-
 $as_vagrant   = 'sudo -u vagrant -H bash -l -c'
 $home         = '/home/vagrant'
 $vchs_base    = "${home}/vchs"
@@ -18,7 +13,7 @@ Exec {
 }
 
 exec { 'install base packages': 
-  cwd => "${vcap}/scripts",
+  cwd => "${vcap}/setup",
   command   => "/bin/bash install_base_packages.sh",    
   logoutput => true, }
 
@@ -68,6 +63,13 @@ file { "${vcap}/download":
   group => "vagrant"
 }
 
+exec { "copy setup scripts":
+  cwd => "${vcap}",
+  user => vagrant,
+  command => "rm -rf setup && cp -r /vagrant/setup .",
+  require => File["${vcap}"]
+}
+
 exec { "copy scripts":
   cwd => "${vcap}",
   user => vagrant,
@@ -88,6 +90,7 @@ notify { "base_setup":
     File["${vchs_base}"], 
     Exec["copy scripts"],
     Exec["copy configs"],
+    Exec["copy setup scripts"],
   ]
 }
 
@@ -98,6 +101,7 @@ exec { 'install vcap-services-base':
     command   => "git clone https://github.com/vchs/vcap-services-base.git ${vchs_base}/vcap-services-base",
     user => "vagrant",
     logoutput => true,
+    timeout => 900,
     require => Notify["base_setup"]
 }
 
@@ -105,6 +109,7 @@ exec { 'update vcap-services-base':
     cwd => "${vchs_base}/vcap-services-base",
     command   => "git pull origin master && bundle",
     user => "vagrant",
+    timeout => 900,
     logoutput => true,
     require => Exec['install vcap-services-base']
 }
@@ -113,6 +118,7 @@ exec { 'install cf-services-release':
     creates   => "${vchs_base}/cf-services-release",
     command   => "git clone https://github.com/vchs/cf-services-release.git ${vchs_base}/cf-services-release",
     user => "vagrant",
+    timeout => 900,
     logoutput => true,
     require => Notify["base_setup"]
 }
@@ -121,6 +127,7 @@ exec { 'update cf-services-release':
     cwd => "${vchs_base}/cf-services-release",
     command   => "git pull origin master && git submodule update --init --recursive",
     user => "vagrant",
+    timeout => 900,
     logoutput => true,
     require => Exec['install cf-services-release']
 }
@@ -129,6 +136,7 @@ exec { 'update mysql_service':
     cwd => "${vchs_base}/cf-services-release/src/mysql_service",
     command   => "bundle",
     user => "vagrant",
+    timeout => 900,
     logoutput => true,
     require => Exec['update cf-services-release']
 }
@@ -137,6 +145,7 @@ exec { 'install nats':
     creates   => "${vchs_base}/nats",
     command   => "git clone https://github.com/cloudfoundry/nats.git ${vchs_base}/nats",
     user => "vagrant",
+    timeout => 900,
     logoutput => true,
     require => Notify["base_setup"]
 }
@@ -145,6 +154,7 @@ exec { 'update nats':
     cwd => "${vchs_base}/nats",
     command   => "git pull origin master && bundle",
     user => "vagrant",
+    timeout => 900,
     logoutput => true,
     require => Exec['install nats']
 }
@@ -153,6 +163,7 @@ exec { 'install cf-services-contrib-release':
     creates   => "${vchs_base}/cf-services-contrib-release",
     command   => "git clone https://github.com/cloudfoundry/cf-services-contrib-release.git ${vchs_base}/cf-services-contrib-release",
     user => "vagrant",
+    timeout => 900,
     logoutput => true,
     require => Notify["base_setup"]
 }
@@ -161,6 +172,7 @@ exec { 'update cf-services-contrib-release':
     cwd => "${vchs_base}/cf-services-contrib-release/src/services/echo",
     command   => "git pull origin master && bundle",
     user => "vagrant",
+    timeout => 900,
     logoutput => true,
     require => Exec['install cf-services-contrib-release']
 }
@@ -169,6 +181,7 @@ exec { 'update cf-services-contrib-release':
 #    creates   => "${vchs_base}/service_controller",
 #    command   => "git clone https://github.com/vchs/service_controller.git ${vchs_base}/service_controller",
 #    user => "vagrant",
+#    timeout => 900,
 #    logoutput => true,
 #    require => Notify["base_setup"]
 #}
@@ -177,6 +190,7 @@ exec { 'update cf-services-contrib-release':
 #    cwd => "${vchs_base}/service_controller",
 #    command   => "git pull origin master",  # TODO: Add bundle
 #    user => "vagrant",
+#    timeout => 900,
 #    logoutput => true,
 #    require => Exec['install service_controller']
 #}
@@ -195,16 +209,17 @@ notify { "cloned_base_repos":
 # --- Setup external dependencies
 
 exec { 'setup dependencies as root':
-    cwd => "${vcap}/scripts",
+    cwd => "${vcap}/setup",
     command   => "/bin/bash setup_mysql_ldconf_file.sh",    
     logoutput => true,
     require => Notify["cloned_base_repos"]
 }
 
 exec { 'setup external dependencies':
-    cwd => "${vcap}/scripts",
+    cwd => "${vcap}/setup",
     command   => "${as_vagrant} 'setup_mysql.sh'",
     user => "vagrant",
+    timeout => 900,
     logoutput => true,
     require => Notify["cloned_base_repos"]
 }
