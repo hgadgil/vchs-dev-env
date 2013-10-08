@@ -58,6 +58,3 @@ Known Issues:
 
 1. Vagrant VM does not start on first try. In this case, redo the setup, i.e.
    vagrant halt && vagrant up
-
-2. NATS process takes up 40% - 60% CPU. So you'll notice some slowness when running shell
-   commands.

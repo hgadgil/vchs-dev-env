@@ -28,13 +28,15 @@ notify { "install base ubuntu libs":
 exec { 'install_rvm':
   command => "${as_vagrant} 'curl -L https://get.rvm.io | bash -s stable'",
   creates => "${home}/.rvm",
-  require => Notify['install base ubuntu libs']
-}
+  require => Notify['install base ubuntu libs'],
+  timeout => 900,
+    }
 
 exec { 'install_ruby':
   command => "${as_vagrant} '${home}/.rvm/bin/rvm install ${ruby_version} && rvm alias create default ruby-${ruby_version}'",
   creates => "${home}/.rvm/bin/ruby",
-  require => Exec['install_rvm']
+  require => Exec['install_rvm'],
+  timeout => 900,
 }
 
 package { 'bundler': 
@@ -86,7 +88,7 @@ exec { "copy configs":
 
 notify { "base_setup":
   require => [
-    Exec["install_ruby"],
+    Package["bundler"],
     File["${vchs_base}"], 
     Exec["copy scripts"],
     Exec["copy configs"],
@@ -141,24 +143,6 @@ exec { 'update mysql_service':
     require => Exec['update cf-services-release']
 }
 
-exec { 'install nats':
-    creates   => "${vchs_base}/nats",
-    command   => "git clone https://github.com/cloudfoundry/nats.git ${vchs_base}/nats",
-    user => "vagrant",
-    timeout => 900,
-    logoutput => true,
-    require => Notify["base_setup"]
-}
-
-exec { 'update nats':
-    cwd => "${vchs_base}/nats",
-    command   => "git pull origin master && bundle",
-    user => "vagrant",
-    timeout => 900,
-    logoutput => true,
-    require => Exec['install nats']
-}
-
 exec { 'install cf-services-contrib-release':
     creates   => "${vchs_base}/cf-services-contrib-release",
     command   => "git clone https://github.com/cloudfoundry/cf-services-contrib-release.git ${vchs_base}/cf-services-contrib-release",
@@ -199,7 +183,6 @@ notify { "cloned_base_repos":
   require => [
     Exec['update vcap-services-base'],
     Exec['update cf-services-release'],
-    Exec['update nats'],
     Exec['update mysql_service'],
     Exec['update cf-services-contrib-release'],
 #    Exec['update service_controller'],

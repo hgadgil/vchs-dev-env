@@ -13,6 +13,9 @@ export STORE_DIR_BASE=$VCAP_HOME/store
 export DOWNLOAD_DIR=$VCAP_HOME/download
 
 export INSTALL_DIR=$HOME/vchs
+export SCRIPTS_DIR=$VCAP_HOME/scripts
+
+export RUBY_HOME=$HOME/.rvm/rubies/ruby-1.9.3-p392
 
 make_dir() {
   dir_name=$1

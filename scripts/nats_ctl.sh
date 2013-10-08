@@ -17,7 +17,7 @@ case $1 in
 
     echo $$ > $PIDFILE
 
-    exec $INSTALL_DIR/nats/bin/nats-server \
+    exec $RUBY_HOME/bin/ruby $SCRIPTS_DIR/nats-server-runner.rb \
          -c $CFG_DIR_BASE/nats.yml \
          >>$LOG_DIR/nats.stdout.log \
          2>>$LOG_DIR/nats.stderr.log
