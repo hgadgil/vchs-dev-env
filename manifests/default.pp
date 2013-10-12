@@ -12,40 +12,7 @@ Exec {
   ]
 }
 
-exec { 'install base packages': 
-  cwd => "${vcap}/setup",
-  command   => "/bin/bash install_base_packages.sh",    
-  logoutput => true, }
-
-notify { "install base ubuntu libs":
-  require => [
-    Exec["install base packages"],
-  ]
-}
-
-# --- Install rvm and ruby via rvm, bundler
-
-exec { 'install_rvm':
-  command => "${as_vagrant} 'curl -L https://get.rvm.io | bash -s stable'",
-  creates => "${home}/.rvm",
-  require => Notify['install base ubuntu libs'],
-  timeout => 900,
-    }
-
-exec { 'install_ruby':
-  command => "${as_vagrant} '${home}/.rvm/bin/rvm install ${ruby_version} && rvm alias create default ruby-${ruby_version}'",
-  creates => "${home}/.rvm/bin/ruby",
-  require => Exec['install_rvm'],
-  timeout => 900,
-}
-
-package { 'bundler': 
-  ensure => 'installed', 
-  provider => 'gem',
-  require => Exec["install_ruby"]
-}
-
-# --- Create Base folders & copy necessary configs/scripts
+# --- Create Base folders & copy necessary configs/scripts & setup ssh keys
 
 file { "${vchs_base}": 
   ensure => 'directory',
@@ -72,6 +39,22 @@ exec { "copy setup scripts":
   require => File["${vcap}"]
 }
 
+exec { "copy ssh keys":
+  cwd => "${vcap}",
+  creates => "${home}/.ssh/ci-cf-vchs.pub",
+  user => vagrant,
+  command => "cp /vagrant/ssh_keys/id_rsa* ${home}/.ssh",
+  require => File["${vcap}"]
+}
+
+exec { "copy ssh config":
+  cwd => "${vcap}",
+  creates => "${home}/.ssh/config",
+  user => vagrant,
+  command => "cp /vagrant/ssh_config ${home}/.ssh/config",
+  require => File["${vcap}"]
+}
+
 exec { "copy scripts":
   cwd => "${vcap}",
   user => vagrant,
@@ -86,16 +69,62 @@ exec { "copy configs":
   require => File["${vcap}"]
 }
 
-notify { "base_setup":
+notify { "copy files":
   require => [
-    Package["bundler"],
     File["${vchs_base}"], 
     Exec["copy scripts"],
     Exec["copy configs"],
     Exec["copy setup scripts"],
+    Exec["copy ssh keys"],
+    Exec["copy ssh config"],
   ]
 }
 
+exec { 'setup base ssh_keys':
+  cwd => "${vcap}/setup",
+  command   => "/bin/bash setup_ssh_keys.sh",
+  logoutput => true,
+  require => Notify["copy files"],
+}
+
+exec { 'install base packages':
+  cwd => "${vcap}/setup",
+  command   => "/bin/bash install_base_packages.sh",
+  logoutput => true,
+  require => Exec["setup base ssh_keys"],
+}
+
+notify { "base installation":
+  require => [
+    Exec["install base packages"],
+  ]
+}
+
+# --- Install rvm and ruby via rvm, bundler
+
+exec { 'install_rvm':
+  command => "${as_vagrant} 'curl -L https://get.rvm.io | bash -s stable'",
+  creates => "${home}/.rvm",
+  require => Notify['base installation'],
+  timeout => 900,
+}
+
+exec { 'install_ruby':
+  command => "${as_vagrant} '${home}/.rvm/bin/rvm install ${ruby_version} && rvm alias create default ruby-${ruby_version}'",
+  creates => "${home}/.rvm/bin/ruby",
+  require => Exec['install_rvm'],
+  timeout => 900,
+}
+
+package { 'bundler':
+  ensure => 'installed',
+  provider => 'gem',
+  require => Exec["install_ruby"]
+}
+
+notify { "ruby and dependencies":
+  require => Package["bundler"],
+}
 # --- Clone base repositories
 
 exec { 'install vcap-services-base':
@@ -104,7 +133,7 @@ exec { 'install vcap-services-base':
     user => "vagrant",
     logoutput => true,
     timeout => 900,
-    require => Notify["base_setup"]
+    require => Notify["ruby and dependencies"]
 }
 
 exec { 'update vcap-services-base':
@@ -116,32 +145,32 @@ exec { 'update vcap-services-base':
     require => Exec['install vcap-services-base']
 }
 
-exec { 'install cf-services-release':
-    creates   => "${vchs_base}/cf-services-release",
-    command   => "git clone https://github.com/vchs/cf-services-release.git ${vchs_base}/cf-services-release",
-    user => "vagrant",
-    timeout => 900,
-    logoutput => true,
-    require => Notify["base_setup"]
-}
+#exec { 'install cf-services-release':
+#    creates   => "${vchs_base}/cf-services-release",
+#    command   => "git clone https://github.com/vchs/cf-services-release.git ${vchs_base}/cf-services-release",
+#    user => "vagrant",
+#    timeout => 900,
+#    logoutput => true,
+#    require => Notify["ruby and dependencies"]
+#}
 
-exec { 'update cf-services-release':
-    cwd => "${vchs_base}/cf-services-release",
-    command   => "git pull origin master && git submodule update --init --recursive",
-    user => "vagrant",
-    timeout => 900,
-    logoutput => true,
-    require => Exec['install cf-services-release']
-}
+#exec { 'update cf-services-release':
+#    cwd => "${vchs_base}/cf-services-release",
+#    command   => "git pull origin master && git submodule update --init --recursive",
+#    user => "vagrant",
+#    timeout => 900,
+#    logoutput => true,
+#    require => Exec['install cf-services-release']
+#}
 
-exec { 'update mysql_service':
-    cwd => "${vchs_base}/cf-services-release/src/mysql_service",
-    command   => "bundle",
-    user => "vagrant",
-    timeout => 900,
-    logoutput => true,
-    require => Exec['update cf-services-release']
-}
+#exec { 'update mysql_service':
+#    cwd => "${vchs_base}/cf-services-release/src/mysql_service",
+#    command   => "bundle",
+#    user => "vagrant",
+#    timeout => 900,
+#    logoutput => true,
+#    require => Exec['update cf-services-release']
+#}
 
 exec { 'install cf-services-contrib-release':
     creates   => "${vchs_base}/cf-services-contrib-release",
@@ -149,10 +178,10 @@ exec { 'install cf-services-contrib-release':
     user => "vagrant",
     timeout => 900,
     logoutput => true,
-    require => Notify["base_setup"]
+    require => Notify["ruby and dependencies"]
 }
 
-exec { 'update cf-services-contrib-release':
+exec { 'update echo service':
     cwd => "${vchs_base}/cf-services-contrib-release/src/services/echo",
     command   => "git pull origin master && bundle",
     user => "vagrant",
@@ -161,56 +190,48 @@ exec { 'update cf-services-contrib-release':
     require => Exec['install cf-services-contrib-release']
 }
 
-#exec { 'install service_controller':
-#    creates   => "${vchs_base}/service_controller",
-#    command   => "git clone https://github.com/vchs/service_controller.git ${vchs_base}/service_controller",
-#    user => "vagrant",
-#    timeout => 900,
-#    logoutput => true,
-#    require => Notify["base_setup"]
-#}
-
-#exec { 'update service_controller':
-#    cwd => "${vchs_base}/service_controller",
-#    command   => "git pull origin master",  # TODO: Add bundle
-#    user => "vagrant",
-#    timeout => 900,
-#    logoutput => true,
-#    require => Exec['install service_controller']
-#}
+exec { 'clone update private repos':
+    cwd => "${vcap}/setup",
+    command   => "${as_vagrant} 'clone_update_private_repos.sh'",
+    user => "vagrant",
+    timeout => 900,
+    logoutput => true,
+    require => Notify["ruby and dependencies"]
+}
 
 notify { "cloned_base_repos":
   require => [
     Exec['update vcap-services-base'],
-    Exec['update cf-services-release'],
-    Exec['update mysql_service'],
-    Exec['update cf-services-contrib-release'],
-#    Exec['update service_controller'],
+#    Exec['update cf-services-release'],
+#    Exec['update mysql_service'],
+    Exec['update echo service'],
+    Exec['clone update private repos'],
   ]
 }
 
 # --- Setup external dependencies
 
-exec { 'setup dependencies as root':
-    cwd => "${vcap}/setup",
-    command   => "/bin/bash setup_mysql_ldconf_file.sh",    
-    logoutput => true,
-    require => Notify["cloned_base_repos"]
-}
+#exec { 'setup dependencies as root':
+#    cwd => "${vcap}/setup",
+#    command   => "/bin/bash setup_mysql_ldconf_file.sh",
+#    logoutput => true,
+#    require => Notify["cloned_base_repos"]
+#}
 
-exec { 'setup external dependencies':
-    cwd => "${vcap}/setup",
-    command   => "${as_vagrant} 'setup_mysql.sh'",
-    user => "vagrant",
-    timeout => 900,
-    logoutput => true,
-    require => Notify["cloned_base_repos"]
-}
+#exec { 'setup external dependencies':
+#    cwd => "${vcap}/setup",
+#    command   => "${as_vagrant} 'setup_mysql.sh'",
+#    user => "vagrant",
+#    timeout => 900,
+#    logoutput => true,
+#    require => Notify["cloned_base_repos"]
+#}
 
 notify { "setup dependencies":
   require => [
-    Exec['setup external dependencies'],
-    Exec['setup dependencies as root'],
+     Notify["cloned_base_repos"],
+#    Exec['setup external dependencies'],
+#    Exec['setup dependencies as root'],
   ]
 }
 

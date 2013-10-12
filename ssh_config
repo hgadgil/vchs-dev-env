@@ -1,0 +1,5 @@
+Host github-vchs
+  HostName github.com
+  User ci-cf-vchs
+  IdentityFile ~/.ssh/id_rsa
+  StrictHostKeyChecking=no

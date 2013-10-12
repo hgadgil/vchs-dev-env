@@ -5,6 +5,8 @@ cd /home/vagrant/vcap/scripts
 case $1 in
 
   start)
+   ./sc_ctl.sh start &
+
    ./nats_ctl.sh start &
    
 #   ./mysql_ctl.sh start &
@@ -26,6 +28,8 @@ case $1 in
    ./echo_node_ctl.sh stop
    
    ./nats_ctl.sh stop
+
+   ./sc_ctl.sh stop &
     ;;
 
   *)
