@@ -41,7 +41,7 @@ exec { "copy setup scripts":
 
 exec { "copy ssh keys":
   cwd => "${vcap}",
-  creates => "${home}/.ssh/ci-cf-vchs.pub",
+  creates => "${home}/.ssh/id_rsa.pub",
   user => vagrant,
   command => "cp /vagrant/ssh_keys/id_rsa* ${home}/.ssh",
   require => File["${vcap}"]
