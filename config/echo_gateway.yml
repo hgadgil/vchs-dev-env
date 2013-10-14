@@ -1,17 +1,27 @@
 ---
-
-cloud_controller_uri: http://api.tempest-dev01.127.0.0.1.xip.io
+cloud_controller_uri: http://127.0.0.1:3000
 service:
   name: echo
+  unique_id: "92a06847-9446-407f-8aaa-a6f20c1d2cdc"
   version: "1.0"
   description: 'Echo service'
-  plans: ['free']
+  provider: core
+  provider_name: 'Core'
+  plans:
+    free:
+      name: "free"
+      description: "free plan"
+      free: true
+      unique_id: "92a06847-9446-407f-8aaa-a6f20c1d2cde"
   default_plan: free
   tags: ['echo', 'echo-1.0', 'echobased', 'demo']
   supported_versions: ['1.0']
   version_aliases:
     'current': '1.0'
   timeout: 10
+  extra:
+  info_url: "http://echo"
+
 ip_route: localhost
 index: 0
 mbus: nats://nats:nats@127.0.0.1:4222
@@ -30,7 +40,7 @@ logging:
 
 pid: /home/vagrant/vcap/run/echo_gateway.pid
 node_timeout: 2
-cc_api_version: v1
+cc_api_version: scv1
 token: "echo_token"
 
 node_timeout: 8

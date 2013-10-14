@@ -17,7 +17,7 @@ case $1 in
 
     echo $$ > $PIDFILE
 
-    exec $INSTALL_DIR/cf-services-contrib-release/src/services/echo/bin/echo_node \
+    exec $INSTALL_DIR/echo/bin/echo_node \
          -c $CFG_DIR_BASE/echo_node.yml \
          >>$LOG_DIR/echo_node.stdout.log \
          2>>$LOG_DIR/echo_node.stderr.log

@@ -172,24 +172,6 @@ exec { 'update vcap-services-base':
 #    require => Exec['update cf-services-release']
 #}
 
-exec { 'install cf-services-contrib-release':
-    creates   => "${vchs_base}/cf-services-contrib-release",
-    command   => "git clone https://github.com/cloudfoundry/cf-services-contrib-release.git ${vchs_base}/cf-services-contrib-release",
-    user => "vagrant",
-    timeout => 900,
-    logoutput => true,
-    require => Notify["ruby and dependencies"]
-}
-
-exec { 'update echo service':
-    cwd => "${vchs_base}/cf-services-contrib-release/src/services/echo",
-    command   => "git pull origin master && bundle",
-    user => "vagrant",
-    timeout => 900,
-    logoutput => true,
-    require => Exec['install cf-services-contrib-release']
-}
-
 exec { 'clone update private repos':
     cwd => "${vcap}/setup",
     command   => "${as_vagrant} 'clone_update_private_repos.sh'",
@@ -204,7 +186,6 @@ notify { "cloned_base_repos":
     Exec['update vcap-services-base'],
 #    Exec['update cf-services-release'],
 #    Exec['update mysql_service'],
-    Exec['update echo service'],
     Exec['clone update private repos'],
   ]
 }
