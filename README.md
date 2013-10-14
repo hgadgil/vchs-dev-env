@@ -11,7 +11,7 @@ Starting Vagrant VM:
 -------------------
 
 1. Add the vagrant box (This will shortly be moved to custom box created using veewee)
-    ``vagrant box add http://files.vagrantup.com/precise64.box``
+    ``vagrant box add precise64 http://files.vagrantup.com/precise64.box``
 
 1. Clone this repo
     ``git clone https://...``ß
