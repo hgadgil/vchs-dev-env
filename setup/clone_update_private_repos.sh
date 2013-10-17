@@ -17,7 +17,7 @@ if [ -x $HOME/vchs/service_controller ] ; then
   # --- perform rails specific setup action
   # --- start from clean slate
   # bundle exec rake db:drop:all
-  # bundle exec rake db:migrate
+  bundle exec rake db:migrate
 
 fi
 
