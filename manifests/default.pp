@@ -216,12 +216,20 @@ notify { "setup dependencies":
   ]
 }
 
-# --- Start various components
+# --- Restart various components
+
+exec { 'stop components':
+    cwd => "${vcap}/scripts",
+    command   => "${as_vagrant} 'components.sh stop'",
+    user => "vagrant",
+    logoutput => true,
+    require => Notify["setup dependencies"]
+}
 
 exec { 'start components':
     cwd => "${vcap}/scripts",
     command   => "${as_vagrant} 'components.sh start'",
     user => "vagrant",
     logoutput => true,
-    require => Notify["setup dependencies"]
+    require => Exec["stop components"]
 }

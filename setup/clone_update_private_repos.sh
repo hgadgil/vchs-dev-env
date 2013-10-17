@@ -4,6 +4,8 @@ eval `ssh-agent`
 
 ssh-add $HOME/.ssh/id_rsa
 
+# -- INSTALL Service Controller
+# -----------------------------
 if [ ! -x $HOME/vchs/service_controller ] ; then
   git clone git@github-vchs:vchs/service_controller.git $HOME/vchs/service_controller
 fi
@@ -21,6 +23,10 @@ if [ -x $HOME/vchs/service_controller ] ; then
 
 fi
 
+
+# -- INSTALL Echo Node/Gateway
+# ----------------------------
+
 if [ ! -x $HOME/vchs/echo ] ; then
   git clone git@github-vchs:vchs/echo.git $HOME/vchs/echo
 fi
@@ -30,4 +36,24 @@ if [ -x $HOME/vchs/echo ] ; then
   git pull origin master
 
   bundle install
+fi
+
+
+# -- INSTALL Service Controller CLI
+# ---------------------------------
+
+if [ ! -x $HOME/vchs/sc-cli ] ; then
+  git clone git@github-vchs:vchs/sc-cli.git $HOME/vchs/sc-cli
+fi
+
+if [ -x $HOME/vchs/sc-cli ] ; then
+
+  gem uninstall sc-cli -x -a
+
+  cd $HOME/vchs/sc-cli
+  git pull origin master
+
+  bundle install
+  gem build sc-cli.gemspec
+  gem install sc-cli*.gem --no-ri --no-rdoc
 fi

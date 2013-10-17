@@ -98,7 +98,7 @@ kill_and_wait() {
   pidfile=$1
   # Monit default timeout for start/stop is 30s
   # Append 'with timeout {n} seconds' to monit start/stop program configs
-  timeout=${2:-25}
+  timeout=${2:-10}
   force=${3:-1}
 
   wait_pidfile $pidfile 1 $timeout $force
