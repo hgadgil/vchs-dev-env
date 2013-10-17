@@ -1,6 +1,8 @@
 #!/bin/bash
 
-source ./base.sh
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+source $DIR/base.sh
 
 RUN_DIR=$RUN_DIR_BASE/echo_gateway
 LOG_DIR=$LOG_DIR_BASE/echo_gateway
