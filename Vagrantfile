@@ -1,9 +1,11 @@
-Vagrant::Config.run do | config |
-    config.vm.box = "precise64"
-    config.vm.forward_port 80, 3000
-
-    config.vm.customize ["modifyvm", :id, "--memory", 1024]
-
-    config.vm.provision :puppet, :options => "--verbose"
+Vagrant.configure("2") do | config |
+  config.vm.box = "precise64"
+    
+  config.vm.provider "virtualbox" do |v|
+    v.customize ["modifyvm", :id, "--memory", 1024]
+  end
+                  
+  config.vm.provision "puppet" do |p|
+    p.options = "--verbose"
+  end
 end
-
