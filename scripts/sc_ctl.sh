@@ -12,7 +12,10 @@ PIDFILE=$RUN_DIR/sc.pid
 case $1 in
 
   start)
-    pid_guard $PIDFILE "SERVICE_CONTROLLER"
+
+   rm -f $INSTALL_DIR/service_controller/tmp/pids/server.pid
+
+   pid_guard $PIDFILE "SERVICE_CONTROLLER"
 
     make_dir $RUN_DIR
     make_dir $LOG_DIR
